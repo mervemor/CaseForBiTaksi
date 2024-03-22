@@ -2,6 +2,7 @@ package handler
 
 import (
 	"DriverLocationAPI/internal/domain"
+	"DriverLocationAPI/internal/helpers"
 	"DriverLocationAPI/internal/service"
 	"encoding/json"
 	"log"
@@ -21,6 +22,19 @@ func NewDriverHandler(s *service.DriverService) *DriverHandler {
 func (d *DriverHandler) DriverHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	apiKey := r.Header.Get("Apikey")
+	authenticated, err := helpers.TokenAuthenticate(apiKey)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Println("Internal Server Error:", err)
+		return
+	}
+
+	if !authenticated {
+		http.Error(w, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
 
