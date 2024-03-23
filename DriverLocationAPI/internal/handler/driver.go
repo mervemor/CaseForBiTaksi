@@ -39,7 +39,7 @@ func (d *DriverHandler) DriverHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nearestDrivers, err := d.Service.DriverService(requestPayload.UserRadius, requestPayload.UserCoordinates)
+	nearestDrivers, err := d.Service.NearestDriverService(requestPayload.UserRadius, requestPayload.UserCoordinates)
 	if err != nil {
 		http.Error(w, "Error finding driver", http.StatusInternalServerError)
 		log.Println("Error finding driver:", err)
@@ -62,4 +62,22 @@ func (d *DriverHandler) DriverHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(responseJSON)
+}
+
+func (d *DriverHandler) UpsertDriverHandler(w http.ResponseWriter, r *http.Request) {
+	var drivers []domain.DriverUpsertRequest
+	if err := json.NewDecoder(r.Body).Decode(&drivers); err != nil {
+		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	err := d.Service.UpsertDriverService(drivers)
+	if err != nil {
+		http.Error(w, "Error upserting drivers", http.StatusInternalServerError)
+		log.Println("Error upserting drivers:", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Drivers upserted successfully"))
 }

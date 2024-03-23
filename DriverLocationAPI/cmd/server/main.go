@@ -24,6 +24,7 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/find-nearest-driver", driverHandler.DriverHandler).Methods("POST")
+	router.HandleFunc("/upsert-driver", driverHandler.UpsertDriverHandler).Methods("POST")
 
 	err := http.ListenAndServe(":8080", router)
 	if err != nil {

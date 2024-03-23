@@ -22,3 +22,8 @@ type NearestDriver struct {
 	DriverID primitive.ObjectID `json:"id,omitempty"`
 	Distance float64            `json:"distance,omitempty"`
 }
+
+type DriverUpsertRequest struct {
+	Id       string          `json:"id,omitempty"`
+	Location GeoJSONLocation `json:"location,omitempty" validate:"required"`
+}
