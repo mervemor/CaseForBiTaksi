@@ -8,3 +8,9 @@ type RiderRequest struct {
 	UserCoordinates []float64          `json:"coordinates,omitempty" validate:"required"`
 	UserRadius      float64            `json:"radius,omitempty" validate:"required"`
 }
+
+type RiderResponse struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}

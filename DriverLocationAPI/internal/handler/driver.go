@@ -20,20 +20,15 @@ func NewDriverHandler(s *service.DriverService) *DriverHandler {
 }
 
 func (d *DriverHandler) DriverHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
-	apiKey := r.Header.Get("Apikey")
-	authenticated, err := helpers.TokenAuthenticate(apiKey)
+	tokenAuthentication, err := helpers.TokenAuthenticate(r.Header.Get("Apikey"))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println("Internal Server Error:", err)
 		return
 	}
 
-	if !authenticated {
+	if !tokenAuthentication {
 		http.Error(w, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
@@ -44,10 +39,7 @@ func (d *DriverHandler) DriverHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	coordinates := requestPayload.UserCoordinates
-	radius := requestPayload.UserRadius
-
-	nearestDrivers, err := d.Service.DriverService(radius, coordinates)
+	nearestDrivers, err := d.Service.DriverService(requestPayload.UserRadius, requestPayload.UserCoordinates)
 	if err != nil {
 		http.Error(w, "Error finding driver", http.StatusInternalServerError)
 		log.Println("Error finding driver:", err)

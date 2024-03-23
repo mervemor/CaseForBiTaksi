@@ -27,13 +27,7 @@ func RiderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authToken := strings.Fields(requestToken)[1]
-	claims := jwt.MapClaims{}
-	_, err := jwt.ParseWithClaims(authToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("<true>"), nil
-	})
-
-	if !helpers.CheckAuthorization(claims) {
+	if !checkAuthorization(requestToken) {
 		http.Error(w, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
@@ -45,7 +39,7 @@ func RiderHandler(w http.ResponseWriter, r *http.Request) {
 		UserRadius:      rider.UserRadius,
 	}
 
-	riderRequestDataConvertedJson, err := json.Marshal(riderRequest)
+	riderRequestJSON, err := json.Marshal(riderRequest)
 	if err != nil {
 		http.Error(w, "Error encoding rider request", http.StatusInternalServerError)
 		log.Println("Error encoding rider request:", err)
@@ -57,9 +51,9 @@ func RiderHandler(w http.ResponseWriter, r *http.Request) {
 		"Content-Type": "application/json",
 	}
 
-	resp, err := helpers.SendHTTPRequest("POST", "http://localhost:8080/find-nearest-driver", riderRequestDataConvertedJson, headers)
+	resp, err := helpers.SendHTTPRequest("POST", "http://localhost:8080/find-nearest-driver", riderRequestJSON, headers)
 	if err != nil {
-		http.Error(w, "Error sending request to find driver", http.StatusBadRequest)
+		http.Error(w, "Error sending request to Driver Location API", http.StatusBadRequest)
 		return
 	}
 
@@ -68,15 +62,15 @@ func RiderHandler(w http.ResponseWriter, r *http.Request) {
 	var result domain.RiderResponse
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, "Error reading response from find driver", http.StatusInternalServerError)
-		log.Println("Error reading response from find driver:", err)
+		http.Error(w, "Error reading rider response", http.StatusInternalServerError)
+		log.Println("Error reading rider response:", err)
 		return
 	}
 
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		http.Error(w, "Error decoding response from find driver", http.StatusBadRequest)
-		log.Println("Error decoding response from find driver:", err)
+		http.Error(w, "Error decoding rider response", http.StatusBadRequest)
+		log.Println("Error decoding rider response:", err)
 		return
 	}
 
@@ -92,4 +86,17 @@ func RiderHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}
+}
+
+func checkAuthorization(requestToken string) bool {
+	authToken := strings.Fields(requestToken)[1]
+	claims := jwt.MapClaims{}
+	_, _ = jwt.ParseWithClaims(authToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte("<true>"), nil
+	})
+
+	if authenticated, ok := claims["authenticated"].(bool); ok && authenticated {
+		return true
+	}
+	return false
 }

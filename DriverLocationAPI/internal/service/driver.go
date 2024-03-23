@@ -16,11 +16,11 @@ func NewDriverService(repo repository.DriverRepository) *DriverService {
 	}
 }
 
-func (d *DriverService) DriverService(userRadius float64, userCoordinates []float64) ([]domain.DistanceBetweenDriverAndUser, error) {
+func (d *DriverService) DriverService(userRadius float64, userCoordinates []float64) ([]domain.NearestDriver, error) {
 	ctx := context.TODO()
 	records, err := d.Repository.FindNearestDriver(ctx, userRadius, userCoordinates)
 	if err != nil {
-		return []domain.DistanceBetweenDriverAndUser{}, err
+		return []domain.NearestDriver{}, err
 	}
 
 	return records, nil
