@@ -1,6 +1,7 @@
 package handler
 
 import (
+	_ "MatchingAPI/docs"
 	"MatchingAPI/internal/domain"
 	"MatchingAPI/internal/helpers"
 	"encoding/json"
@@ -12,6 +13,14 @@ import (
 	"strings"
 )
 
+// RiderHandler @Summary Rider Handler
+// @Description Handle rider requests and communicate with the Driver Location API
+// @ID rider-handler
+// @Accept  json
+// @Produce  json
+// @Param   riderRequest     body    domain.RiderRequest  true        "Rider request object"
+// @Success 200 {object} domain.RiderResponse
+// @Router /handle-rider [post]
 func RiderHandler(w http.ResponseWriter, r *http.Request) {
 	var rider domain.RiderRequest
 

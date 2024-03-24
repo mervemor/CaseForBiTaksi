@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,6 +19,10 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/find-driver", handler.RiderHandler).Methods("POST")
+
+	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8081/swagger/doc.json"),
+	))
 
 	server := &http.Server{
 		Addr:    ":8081",

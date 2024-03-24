@@ -1,0 +1,82 @@
+definitions:
+  domain.DriverResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  domain.DriverUpsertRequest:
+    properties:
+      id:
+        type: string
+      location:
+        $ref: '#/definitions/domain.GeoJSONLocation'
+    required:
+    - location
+    type: object
+  domain.GeoJSONLocation:
+    properties:
+      coordinates:
+        items:
+          type: number
+        type: array
+      type:
+        type: string
+    required:
+    - type
+    type: object
+info:
+  contact: {}
+paths:
+  /find-nearest-driver:
+    post:
+      consumes:
+      - application/json
+      description: Find the nearest driver based on user coordinates and radius
+      operationId: find-nearest-driver
+      parameters:
+      - description: User radius
+        in: query
+        name: userRadius
+        required: true
+        type: number
+      - collectionFormat: csv
+        description: User coordinates (latitude, longitude)
+        in: query
+        items:
+          type: number
+        name: userCoordinates
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.DriverResponse'
+  /upsert-driver:
+    post:
+      consumes:
+      - application/json
+      description: Upsert driver data to the database
+      operationId: upsert-driver
+      parameters:
+      - description: Array of driver data to upsert
+        in: body
+        name: drivers
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/domain.DriverUpsertRequest'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+swagger: "2.0"

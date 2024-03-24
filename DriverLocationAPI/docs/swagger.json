@@ -1,0 +1,127 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/find-nearest-driver": {
+            "post": {
+                "description": "Find the nearest driver based on user coordinates and radius",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "operationId": "find-nearest-driver",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "User radius",
+                        "name": "userRadius",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "User coordinates (latitude, longitude)",
+                        "name": "userCoordinates",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.DriverResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/upsert-driver": {
+            "post": {
+                "description": "Upsert driver data to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "operationId": "upsert-driver",
+                "parameters": [
+                    {
+                        "description": "Array of driver data to upsert",
+                        "name": "drivers",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.DriverUpsertRequest"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.DriverResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.DriverUpsertRequest": {
+            "type": "object",
+            "required": [
+                "location"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/domain.GeoJSONLocation"
+                }
+            }
+        },
+        "domain.GeoJSONLocation": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "coordinates": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

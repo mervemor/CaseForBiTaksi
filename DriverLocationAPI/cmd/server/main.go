@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,6 +33,10 @@ func main() {
 
 	router.HandleFunc("/find-nearest-driver", driverHandler.DriverHandler).Methods("POST")
 	router.HandleFunc("/upsert-driver", driverHandler.UpsertDriverHandler).Methods("POST")
+
+	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 
 	server := &http.Server{
 		Addr:    ":8080",
