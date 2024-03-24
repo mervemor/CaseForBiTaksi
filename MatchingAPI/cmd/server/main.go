@@ -2,19 +2,49 @@ package main
 
 import (
 	"MatchingAPI/internal/handler"
+	"context"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
+	ctx := context.Background()
 
 	router := mux.NewRouter()
 
 	router.HandleFunc("/find-driver", handler.RiderHandler).Methods("POST")
 
-	err := http.ListenAndServe(":8081", router)
-	if err != nil {
-		fmt.Println("an error occurred when listening and serving HTTP requests.")
+	server := &http.Server{
+		Addr:    ":8081",
+		Handler: router,
+	}
+
+	shutdown := make(chan os.Signal, 1)
+
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-shutdown
+
+		wait := time.Second * 30
+
+		ctx, cancel := context.WithTimeout(ctx, wait)
+		defer cancel()
+
+		if err := server.Shutdown(ctx); err != nil {
+			fmt.Println("an error occurred while shutting down the server:", err)
+		}
+
+		os.Exit(0)
+	}()
+
+	fmt.Println("HTTP server is listening on port 8081...")
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		fmt.Println("an error occurred when listening and serving HTTP requests:", err)
 	}
 }

@@ -49,7 +49,7 @@ func (d *DriverHandler) DriverHandler(w http.ResponseWriter, r *http.Request) {
 	response := domain.DriverResponse{
 		Status:  http.StatusOK,
 		Message: "success",
-		Data:    nearestDrivers[1],
+		Data:    nearestDrivers[0],
 	}
 
 	responseJSON, err := json.Marshal(response)

@@ -34,7 +34,7 @@ func (d *Driver) FindNearestDriver(ctx context.Context, userRadius float64, user
 				"type":        "Point",
 				"coordinates": userCoordinates,
 			},
-			"$maxDistance": userRadius,
+			"$maxDistance": userRadius * 1000,
 		},
 	}})
 

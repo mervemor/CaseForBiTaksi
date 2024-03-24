@@ -49,7 +49,7 @@ func GetCollectionFromMongoDB(client *mongo.Client) *mongo.Collection {
 	return collection
 }
 
-func WriteCSVDataToMongoDB(ctx context.Context, csvFilePath string, collection *mongo.Collection) error {
+func ImportCSVDataToMongoDB(ctx context.Context, csvFilePath string, collection *mongo.Collection) error {
 	var collectionIsNull domain.GeoJSONLocation
 	collectionErr := collection.FindOne(ctx, bson.M{}).Decode(&collectionIsNull)
 
@@ -106,16 +106,6 @@ func WriteCSVDataToMongoDB(ctx context.Context, csvFilePath string, collection *
 			return err
 		}
 
-		indexes := []mongo.IndexModel{
-			{
-				Keys: bson.M{"location": "2dsphere"},
-			},
-		}
-
-		_, err = collection.Indexes().CreateMany(ctx, indexes)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
