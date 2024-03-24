@@ -106,6 +106,16 @@ func ImportCSVDataToMongoDB(ctx context.Context, csvFilePath string, collection 
 			return err
 		}
 
+		indexes := []mongo.IndexModel{
+			{
+				Keys: bson.M{"location": "2dsphere"},
+			},
+		}
+
+		_, err = collection.Indexes().CreateMany(ctx, indexes)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

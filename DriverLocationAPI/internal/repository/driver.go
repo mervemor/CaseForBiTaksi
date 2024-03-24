@@ -32,7 +32,7 @@ func (d *Driver) FindNearestDriver(ctx context.Context, userRadius float64, user
 		"$nearSphere": bson.M{
 			"$geometry": bson.M{
 				"type":        "Point",
-				"coordinates": userCoordinates,
+				"coordinates": []float64{userCoordinates[0], userCoordinates[1]},
 			},
 			"$maxDistance": userRadius * 1000,
 		},
