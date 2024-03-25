@@ -82,22 +82,16 @@ func (d *Driver) UpsertDriver(ctx context.Context, drivers []domain.DriverUpsert
 			Location: driver.Location,
 		}
 
-		// Check if a driver with the same ID exists in the database
 		existingDriver := d.Collection.FindOne(ctx, bson.M{"_id": newDriver.ID})
 		if existingDriver.Err() == nil {
-			// If exists, update the existing record
 			updateResult, err := d.Collection.ReplaceOne(ctx, bson.M{"_id": newDriver.ID}, newDriver)
 			if err != nil {
-				// Handle the update error
 				return err
 			}
-			// Handle the update result if needed
 			fmt.Println("Updated:", updateResult)
 		} else {
-			// If not exists, insert the new record
 			_, err := d.Collection.InsertOne(ctx, newDriver)
 			if err != nil {
-				// Handle the insertion error
 				return err
 			}
 		}
